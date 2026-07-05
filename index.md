@@ -12,11 +12,11 @@ Hi, I'm Ezra Snow, or "EJSnow" online. I'm what you would call an unprofessional
 
 Check out the pages above for more! This site is probably going to be more static but once in a while I write a blog post or have a new project to share.
 
-## My main PC (The Redstone PC)
+## My main PC (The Razor Crest)
 
-This is my main computer that I use for most things, primarily gaming on Linux. See the [detailed build overview](blog/2024-10-05-redstone-pc/) for more information.
+This is my main computer that I use for most things, primarily gaming on Linux. See the [detailed build overview](blog/2026-07-05-razor-crest/) for more information.
 
-![The Redstone PC as of June 1, 2026](images/latest-redstonepc.jpg)
+![The Razor Crest](images/razor-crest.jpg)
 </article>
 
 <!-- About me -->
@@ -53,19 +53,19 @@ My all-time favorite book series is Lord of the Rings, but a close second is Swa
 
 *Click any picture below to enlarge it*
 
-### The Redstone PC
+### The Razor Crest
 
-![The Redstone PC as of June 1, 2026](images/latest-redstonepc.jpg)
+![The Razor Crest](images/razor-crest.jpg)
 
-This is my main PC. It's a gaming rig first and foremost, but it's also where I store most of my data and it used to be where I did a lot of my experiments with coding and Linux, but I do most of that on my laptop now. I built it in October 2024 and it works surprisingly well for being an old Dell Optiplex with a modern bottom-tier GPU shoved into it and awful thermals overall. My full writeup on that computer is [here](blog/2024-10-05-redstone-pc/).
+This is my main PC. It's a gaming rig first and foremost, but it's also where I store most of my data and it used to be where I did a lot of my experiments with coding and Linux, but I do most of that on my laptop now. I built it on June 25, 2026 as an upgrade to the Redstone PC. I honestly would have preferred it were smaller but it's not gigantic and I definitely plan on making my next computer much smaller.
 
-<details><summary>Specs (original → upgraded):</summary>
+<details><summary>Specs (Redstone PC → Razor Crest):</summary>
 
-* CPU: Intel Core i5-4590 → Intel Core i7-4790
-* RAM: 8GB (2x4GB) DDR3 → **Crucial 16GB (2x8GB) DDR3**
-* GPU: Intel HD 4600 (iGPU) → **Radeon RX 6400**
-* Storage: 128GB 2.5" SSD → **500GB Crucial MX500 2.5" SSD + 1TB Western Digital Blue 2.5" HDD**
-* OS: **Arch Linux** + Windows 10 Pro
+* CPU: Intel Core i7-4790 → (Same CPU)
+* RAM: Crucial 16GB (2x8GB) DDR3 → (Same RAM)
+* GPU: Radeon RX 6400 → **Radeon RX 6600**
+* Storage: 500GB Crucial MX500 2.5" SSD + 1TB Western Digital Blue 2.5" HDD → (Same drives)
+* OS: Arch Linux + Windows 10 Pro dual-boot → Only **Arch Linux**
 
 Items in bold are considered to be significant upgrades.
 
@@ -81,9 +81,9 @@ Twilight is a Lenovo Ideapad Flex 5 15IIL05 laptop that I got for free in August
 
 * CPU: Intel Core i7-1065G7
 * RAM: 16GB LPDDR4
-* GPU: Intel Iris Plus G7 (iGPU)
+* GPU: Intel Iris Plus iGPU
 * Storage: Smasnug PM991 512GB NVMe SSD
-* OS: Windows 10 Home → Windows 11 Home → **Arch Linux**
+* OS: Windows 10 Home → Windows 11 Home → **Arch Linux** (note: Arch has a slight issue where the CPU power limit is forcibly set to 12W for some reason)
 
 </details>
 
