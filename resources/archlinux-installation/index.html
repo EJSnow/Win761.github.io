@@ -24,7 +24,7 @@
         <article role="tabpanel">
           <a id="top" href="/">← 🏡 Home</a>
           <h1>Arch Linux Installation (with Secure Boot)</h1>
-          <pre><code>#include metadata.h<br>// Created Jan 31, 2026<br>// Last updated Jun 1, 2026</code></pre>
+          <pre><code>#include metadata.h<br>// Created Jan 31, 2026<br>// Last updated Aug 10, 2026</code></pre>
           
           <details id="toc">
             <summary>Table of Contents</summary>
@@ -77,7 +77,7 @@
 <p>Generally refer to the <a href="https://wiki.archlinux.org/title/Installation_guide#Installation">official</a> installation guide for this part. The following reflector command can be used to generate a good mirrorlist for the US:</p>
 <pre><code class="language-sh"># reflector --latest 10 --sort rate --country 'United States' --save /etc/pacman.d/mirrorlist
 </code></pre>
-<p>Anyways time to <code>pacstrap</code> the system. Suggested packages to install here (my choices plus some things beyond what the installation guide suggests):</p>
+<p>Anyways time to <code>pacstrap</code> the system. Suggested packages to add to the pacstrap command (my choices plus some things beyond what the installation guide suggests):</p>
 <ul>
 <li><code>base-devel</code> for AUR packages and possibly other shenanigans</li>
 <li>Userspace filesystem utilities: At a minimum, <code>dosfstools</code>, <code>e2fsprogs</code>, and <code>exfatprogs</code>. <code>ntfsprogs</code> might be wanted for NTFS. If I ever get into Btrfs, obviously <code>btrfs-progs</code>.</li>
@@ -89,11 +89,12 @@
 <p>Back in the day you had to generate <code>/etc/fstab</code> to handle partition mounting on boot but Systemd can <a href="https://wiki.archlinux.org/title/Systemd#GPT_partition_automounting">automount partitions</a> when they have the correct types (shown above in the partition layout). So you can skip generating it and continue on in the <a href="https://wiki.archlinux.org/title/Installation_guide#Chroot">chroot</a>.</p>
 <p>I skipped setting up a swap space when partitioning since I use swap on zram and this is best set up at this stage once we're in the chroot. The easiest way to set this up is to install <code>zram-generator</code> and create <code>/etc/systemd/zram-generator.conf</code> with the following:</p>
 <pre><code>[zram0]
+zram-size = min(ram / 2, 16384)
 </code></pre>
-<p>Yes, that's literally it.</p>
+<p>This will be enough to get a zram swap device, half the size of the physical RAM with a maximum size of 16GiB. It won't actually be created until we reboot, however.</p>
 <p>For <a href="https://wiki.archlinux.org/title/Power_management/Suspend_and_hibernate#Hibernation">hibernation</a> support (swap on zram doesn't support hibernation), create a <a href="https://wiki.archlinux.org/title/Swap#Swap_file">swap file</a> that is half the size of your RAM to start with. I rarely use hibernation though and it's best to avoid it entirely when dualbooting since that causes all sorts of weirdness.</p>
 <p>Follow the installation <a href="https://wiki.archlinux.org/title/Installation_guide#Time">guide</a> from the &quot;Time&quot; section up until &quot;Initramfs&quot;. I use systemd-timesyncd for time synchronization. For the &quot;Network configuration&quot; section, enable <code>NetworkManager.service</code> and install/enable <code>firewalld</code>.</p>
-<p>As far as user accounts go, I prefer to lock the root account (preventing you from logging into it) and rely on sudo for root access. Sudo should already be installed (it's a dependency of <code>base-devel</code>). <a href="https://wiki.archlinux.org/title/Sudo#Configuration">Configure it</a> to give members of the <code>wheel</code> group admin privileges. Then add a <a href="https://wiki.archlinux.org/title/Users_and_groups#User_management">user account</a> that is in the <code>wheel</code> group and set a password for it. Finally <a href="https://wiki.archlinux.org/title/Sudo#Disable_root_login">lock the</a> root account.</p>
+<p>As far as user accounts go, I prefer to lock the root account (preventing you from logging into it) and rely on sudo for root access. This does have the distinct issue that the &quot;rescue&quot; mode will be completely non-functional but I keep an &quot;Arch To Go™&quot; installation on my Ventoy drive for troubleshooting anyways. Sudo should already be installed (it's a dependency of <code>base-devel</code>). <a href="https://wiki.archlinux.org/title/Sudo#Configuration">Configure it</a> to give members of the <code>wheel</code> group admin privileges. Then add a <a href="https://wiki.archlinux.org/title/Users_and_groups#User_management">user account</a> that is in the <code>wheel</code> group and set a password for it. Finally <a href="https://wiki.archlinux.org/title/Sudo#Disable_root_login">lock the</a> root account.</p>
 <p>Also set up <a href="https://wiki.archlinux.org/title/Plymouth">Plymouth</a>.</p>
 <h3 id="desktop-environment" tabindex="-1">Desktop environment</h3>
 <p>I currently use KDE Plasma because it's epic. Other supported DEs can be found on the <a href="https://wiki.archlinux.org/title/Desktop_environment">Desktop Environment</a> ArchWiki page.</p>
@@ -116,7 +117,7 @@
 </tr>
 <tr>
 <td>Intel</td>
-<td><code>vulkan-intel</code> (Only supports Broadwell and newer GPUs)<br><code>intel-media-driver</code> (Broadwell and newer, recommended)<br><code>libva-intel-driver</code> (GMA 4500 through Coffee Lake, legacy driver)<br>For QuickSync video, install <code>libvpl</code> and one of these packages depending on your hardware:<br><code>vpl-gpu-rt</code> (Tiger Lake and newer)<br><code>intel-media-sdk</code> (Broadwell through Ice Lake)</td>
+<td><code>vulkan-intel</code> (Only supports Broadwell and newer GPUs, though Ivy Bridge and Haswell have partial support)<br><code>intel-media-driver</code> (Broadwell and newer, recommended)<br><code>libva-intel-driver</code> (GMA 4500 through Coffee Lake, legacy driver)<br>For QuickSync video, install <code>libvpl</code> and one of these packages depending on your hardware:<br><code>vpl-gpu-rt</code> (Tiger Lake and newer)<br><code>intel-media-sdk</code> (Broadwell through Ice Lake)</td>
 </tr>
 </tbody>
 </table>
@@ -173,10 +174,10 @@ $ makepkg -sci
 </code></pre>
 <p>I also like to add the <a href="https://aur.chaotic.cx/">Chaotic-AUR</a> repository to my systems so installing AUR packages doesn't take a million years. It provides prebuilt versions of popular AUR packages and is very nice to have.</p>
 <p>Now, here's all the other apps I like to install:</p>
-<pre><code class="language-sh">$ yay -S --needed awatcher-bundle-bin bleachbit btop digikam discord easyeffects gamemode lib32-gamemode informant kdenlive keepassxc krita ktorrent kweather lact libreoffice-fresh mangohud modrinth-app-bin needrestart obs-studio droidcam-obs-plugin obs-vkcapture-git lib32-obs-vkcapture-git obs-wayland-hotkeys-git pacman-cleanup-hook rpc-bridge-bin spotify steam visual-studio-code-bin vlc
+<pre><code class="language-sh">$ yay -S --needed awatcher-bundle-bin bleachbit btop digikam discord easyeffects gamemode lib32-gamemode informant kdenlive keepassxc kweather libreoffice-fresh mangohud modrinth-app needrestart obs-studio droidcam-obs-plugin obs-vkcapture-git lib32-obs-vkcapture-git obs-wayland-hotkeys-git pacman-cleanup-hook rpc-bridge-bin spotify steam visual-studio-code-bin vlc
 </code></pre>
 <p>And finally my Plasma dotfiles. Follow the instructions on <a href="https://github.com/EJSnow/dotfiles">the repository</a> and that will about do it (currently the panel layout isn't done automatically though).<img src="/images/my-arch-setup.jpg" alt="My Arch setup"></p>
-<h2 id="references" tabindex="-1">References</h2>
+<h2 id="references%2Fsee-also" tabindex="-1">References/See Also</h2>
 <p>I wrote this with the help of MANY ArchWiki pages and a few manpages. Seriously the ArchWiki is amazing, go <a href="https://wiki.archlinux.org">check it out</a>.</p>
 <ul>
 <li><a href="https://wiki.archlinux.org/title/Installation_guide">The official installation guide</a> (The basic skeleton for this page)</li>
