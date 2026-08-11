@@ -2,7 +2,7 @@
 layout: page.html
 title: Arch Linux Installation (with Secure Boot)
 date: 2026-01-31
-lastUpdated: Jun 1, 2026
+lastUpdated: Aug 10, 2026
 toc: true
 tags: resource
 ---
@@ -58,7 +58,7 @@ Generally refer to the [official](https://wiki.archlinux.org/title/Installation_
 # reflector --latest 10 --sort rate --country 'United States' --save /etc/pacman.d/mirrorlist
 ```
 
-Anyways time to `pacstrap` the system. Suggested packages to install here (my choices plus some things beyond what the installation guide suggests):
+Anyways time to `pacstrap` the system. Suggested packages to add to the pacstrap command (my choices plus some things beyond what the installation guide suggests):
 
 * `base-devel` for AUR packages and possibly other shenanigans
 * Userspace filesystem utilities: At a minimum, `dosfstools`, `e2fsprogs`, and `exfatprogs`. `ntfsprogs` might be wanted for NTFS. If I ever get into Btrfs, obviously `btrfs-progs`.
@@ -75,15 +75,16 @@ I skipped setting up a swap space when partitioning since I use swap on zram and
 
 ```
 [zram0]
+zram-size = min(ram / 2, 16384)
 ```
 
-Yes, that's literally it.
+This will be enough to get a zram swap device, half the size of the physical RAM with a maximum size of 16GiB. It won't actually be created until we reboot, however.
 
 For [hibernation](https://wiki.archlinux.org/title/Power_management/Suspend_and_hibernate#Hibernation) support (swap on zram doesn't support hibernation), create a [swap file](https://wiki.archlinux.org/title/Swap#Swap_file) that is half the size of your RAM to start with. I rarely use hibernation though and it's best to avoid it entirely when dualbooting since that causes all sorts of weirdness.
 
 Follow the installation [guide](https://wiki.archlinux.org/title/Installation_guide#Time) from the "Time" section up until "Initramfs". I use systemd-timesyncd for time synchronization. For the "Network configuration" section, enable `NetworkManager.service` and install/enable `firewalld`.
 
-As far as user accounts go, I prefer to lock the root account (preventing you from logging into it) and rely on sudo for root access. Sudo should already be installed (it's a dependency of `base-devel`). [Configure it](https://wiki.archlinux.org/title/Sudo#Configuration) to give members of the `wheel` group admin privileges. Then add a [user account](https://wiki.archlinux.org/title/Users_and_groups#User_management) that is in the `wheel` group and set a password for it. Finally [lock the](https://wiki.archlinux.org/title/Sudo#Disable_root_login) root account.
+As far as user accounts go, I prefer to lock the root account (preventing you from logging into it) and rely on sudo for root access. This does have the distinct issue that the "rescue" mode will be completely non-functional but I keep an "Arch To Go™" installation on my Ventoy drive for troubleshooting anyways. Sudo should already be installed (it's a dependency of `base-devel`). [Configure it](https://wiki.archlinux.org/title/Sudo#Configuration) to give members of the `wheel` group admin privileges. Then add a [user account](https://wiki.archlinux.org/title/Users_and_groups#User_management) that is in the `wheel` group and set a password for it. Finally [lock the](https://wiki.archlinux.org/title/Sudo#Disable_root_login) root account.
 
 Also set up [Plymouth](https://wiki.archlinux.org/title/Plymouth).
 
@@ -104,7 +105,7 @@ For graphics drivers consult this handy table for Intel and AMD graphics (note t
 |GPU brand:|Required packages for Vulkan and hardware video acceleration:|
 |---|---|
 |AMD|`vulkan-radeon` (hardware video acceleration is built into mesa)|
-|Intel|`vulkan-intel` (Only supports Broadwell and newer GPUs)<br>`intel-media-driver` (Broadwell and newer, recommended)<br>`libva-intel-driver` (GMA 4500 through Coffee Lake, legacy driver)<br>For QuickSync video, install `libvpl` and one of these packages depending on your hardware:<br>`vpl-gpu-rt` (Tiger Lake and newer)<br>`intel-media-sdk` (Broadwell through Ice Lake)|
+|Intel|`vulkan-intel` (Only supports Broadwell and newer GPUs, though Ivy Bridge and Haswell have partial support)<br>`intel-media-driver` (Broadwell and newer, recommended)<br>`libva-intel-driver` (GMA 4500 through Coffee Lake, legacy driver)<br>For QuickSync video, install `libvpl` and one of these packages depending on your hardware:<br>`vpl-gpu-rt` (Tiger Lake and newer)<br>`intel-media-sdk` (Broadwell through Ice Lake)|
 
 While it's unlikely I will ever use an Nvidia GPU, if I do end up with one, see the [Nvidia page on](https://wiki.archlinux.org/title/NVIDIA) the ArchWiki.
 
@@ -203,12 +204,12 @@ I also like to add the [Chaotic-AUR](https://aur.chaotic.cx/) repository to my s
 Now, here's all the other apps I like to install: 
 
 ```sh
-$ yay -S --needed awatcher-bundle-bin bleachbit btop digikam discord easyeffects gamemode lib32-gamemode informant kdenlive keepassxc krita ktorrent kweather lact libreoffice-fresh mangohud modrinth-app-bin needrestart obs-studio droidcam-obs-plugin obs-vkcapture-git lib32-obs-vkcapture-git obs-wayland-hotkeys-git pacman-cleanup-hook rpc-bridge-bin spotify steam visual-studio-code-bin vlc
+$ yay -S --needed awatcher-bundle-bin bleachbit btop digikam discord easyeffects gamemode lib32-gamemode informant kdenlive keepassxc kweather libreoffice-fresh mangohud modrinth-app needrestart obs-studio droidcam-obs-plugin obs-vkcapture-git lib32-obs-vkcapture-git obs-wayland-hotkeys-git pacman-cleanup-hook rpc-bridge-bin spotify steam visual-studio-code-bin vlc
 ```
 
 And finally my Plasma dotfiles. Follow the instructions on [the repository](https://github.com/EJSnow/dotfiles) and that will about do it (currently the panel layout isn't done automatically though).![My Arch setup](/images/my-arch-setup.jpg)
 
-## References
+## References/See Also
 
 I wrote this with the help of MANY ArchWiki pages and a few manpages. Seriously the ArchWiki is amazing, go [check it out](https://wiki.archlinux.org).
 

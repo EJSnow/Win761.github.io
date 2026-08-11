@@ -14,7 +14,7 @@ Check out the pages above for more! This site is probably going to be more stati
 
 ## My main PC (The Razor Crest)
 
-This is my main computer that I use for most things, primarily gaming on Linux. See the [detailed build overview](blog/2026-07-05-razor-crest/) for more information.
+This is my main computer that I use for most things, primarily gaming on Linux. See the [detailed build overview](blog/2026-07-06-razor-crest/) for more information.
 
 ![The Razor Crest](images/razor-crest.jpg)
 </article>
@@ -24,7 +24,7 @@ This is my main computer that I use for most things, primarily gaming on Linux. 
 
 # About me
 
-I'm Ezra Snow, an (extremely) nerdy guy who may be addicted to computers and Linux and video games (all of which I spend far too much time playing with...). I live in North Carolina, but this fall I'm heading to college in East Texas to study computer science. Aside from video games and Linuxing, I'm also learning coding and I like reading.
+I'm Ezra Snow, an (extremely) nerdy guy who may be addicted to computers and Linux and video games (all of which I spend far too much time playing with...). I live in North Carolina, but I'm currently at college in Texas, studying computer science. Aside from video games and Linuxing, I'm also learning coding and I like reading/watching movies.
 
 I also strongly dislike just about any piece of technology/software that came out since 2020 because most of them are annoying in that they refuse to respect your privacy and refuse to acknowlege you as the owner. I'm also highly mistrustful of cloud/streaming services and try not to use them when possible (one exception is Spotify because it will take me a while to gain a large enough local music collection to move off Spotify). I plan to eventually experiment with self-hosting and building a homelab, but this is something I can't really do right now because hardware is too darn *expensive*.
 
@@ -83,7 +83,7 @@ Twilight is a Lenovo Ideapad Flex 5 15IIL05 laptop that I got for free in August
 * RAM: 16GB LPDDR4
 * GPU: Intel Iris Plus iGPU
 * Storage: Smasnug PM991 512GB NVMe SSD
-* OS: Windows 10 Home → Windows 11 Home → **Arch Linux** (note: Arch has a slight issue where the CPU power limit is forcibly set to 12W for some reason)
+* OS: Windows 10 Home → Windows 11 Home → **Arch Linux** (note: Arch has a slight issue where the CPU throttles to maintain 11-12W of power draw under sustained loads, **including gaming**)
 
 </details>
 
@@ -93,7 +93,7 @@ Twilight is a Lenovo Ideapad Flex 5 15IIL05 laptop that I got for free in August
 
 This was my main and only PC until I built the Redstone PC. It was originally my mom's laptop, but she upgraded a long time ago and eventually this laptop got passed to me. I used it from 2022 to 2024 just as a regular PC, and it was my introduction to PCs, Windows, PC gaming, and the wide wide world of the Internet (Up until I had that PC I had fairly limited Internet access although I had an Android tablet for a year or two before). I even started experimenting a little bit with Linux in the summer of 2024, but my experimentation was pretty limited.
 
-After it was retired from regular PC duty, I actually turned it into a Minecraft server although it's extremely inactive and was shut down for a while, although I recently restarted it. Eventually it's going to turn into a Windows 7 nostalgia PC.
+After it was retired from regular PC duty, I actually turned it into a small Minecraft server for me and my friends, but eventually it's going to turn into a Windows 7 nostalgia PC.
 
 <details><summary>Specs:</summary>
 
@@ -101,7 +101,7 @@ After it was retired from regular PC duty, I actually turned it into a Minecraft
 * RAM: 8GB DDR3 → 16GB DDR3
 * GPU: Intel HD 4000 (iGPU)
 * Storage: 750GB Western Digital Scorpio Black 2.5" HDD → 500GB Crucial MX500 2.5" SSD
-* OS: Windows 7 Professional → Windows 10 Pro → Linux Mint 22 → Debian 12 → Fedora Server 42
+* OS: Windows 7 Professional → Windows 10 Pro → Linux Mint → Debian → Fedora Server
 
 </details>
 </article>
