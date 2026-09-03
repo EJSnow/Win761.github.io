@@ -7,7 +7,7 @@ toc: true
 tags: resource
 ---
 
-My preferred route for installing Arch Linux including Secure Boot support. This mostly exists just in case I ever have to do a full reinstall/just because I want to fully document my installation route.
+My preferred route for installing Arch Linux including optional Secure Boot support. This mostly exists just in case I ever have to do a full reinstall/just because I want to fully document my installation route.
 
 <!-- excerpt -->
 
@@ -27,14 +27,14 @@ Set the console font if necessary (for example on not-quite-HiDPI laptop screens
 
 See the [installation guide](https://wiki.archlinux.org/title/Installation_guide#Partition_the_disks) and [Partitioning#Partition scheme](https://wiki.archlinux.org/title/Partitioning#Partition_scheme) for more details.
 
-Below is my preferred partitioning scheme (GPT/UEFI). I use swap on zram and a larger swap file for hibernation (if hibernation is desired). For an NVME drive the partitions will be `/dev/nvme0n1p1` for the ESP and `/dev/nvme0n1p2` for the root partition. I honestly don't put too much stock in the partition numbers though since they often end up being completely different due to dual-booting shenaniganery. Use `lsblk` to ensure you've got the partitions straight :)
+Below is my preferred partitioning scheme (GPT/UEFI). I use swap on zram and do not require hibernation.
 
 |Mount point|Partition|Partition type GUID|Suggested size|
 |---|---|---|---|
-|`/efi`|`/dev/sda1`|`C12A7328-F81F-11D2-BA4B-00A0C93EC93B`: EFI system partition (`uefi` alias in fdisk)|250MiB-1GiB|
-|`/`|`/dev/sda2`|`4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709`: Linux x86_64 root|Remainder of the drive.|
+|`/efi`|EFI System Partition|`C12A7328-F81F-11D2-BA4B-00A0C93EC93B` (`uefi` alias in fdisk)|250MiB-1GiB|
+|`/`|Linux x86_64 root|`4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709`|Remainder of the drive.|
 
-Create the partitions using, e.g, [fdisk](https://wiki.archlinux.org/title/Fdisk). Obviously **all data on the drive will be erased** so take appropriate precautions.
+Create the partitions using, e.g, [fdisk](https://wiki.archlinux.org/title/Fdisk). Obviously **all data on the drive will be erased** so take appropriate precautions. Make note of the numbers (e.g sda1, sda2, etc).
 
 Now the root partition can be formatted as ext4 (although other filesystems can be used).
 
@@ -52,15 +52,15 @@ Mount the root partition to `/mnt` and the ESP to `/mnt/efi`.
 
 ## Installing the base system
 
-Generally refer to the [official](https://wiki.archlinux.org/title/Installation_guide#Installation) installation guide for this part. The following reflector command can be used to generate a good mirrorlist for the US:
+Generally refer to the [official](https://wiki.archlinux.org/title/Installation_guide#Installation) installation guide for this part. Before installing packages, the following reflector command should be used to generate the pacman mirrorlist:
 
 ```sh
-# reflector --latest 10 --sort rate --country 'United States' --save /etc/pacman.d/mirrorlist
+# reflector --latest 5 --sort rate --country 'United States' --save /etc/pacman.d/mirrorlist
 ```
 
 Anyways time to `pacstrap` the system. Suggested packages to add to the pacstrap command (my choices plus some things beyond what the installation guide suggests):
 
-* `base-devel` for AUR packages and possibly other shenanigans
+* `base-devel` for AUR packages and development
 * Userspace filesystem utilities: At a minimum, `dosfstools`, `e2fsprogs`, and `exfatprogs`. `ntfsprogs` might be wanted for NTFS. If I ever get into Btrfs, obviously `btrfs-progs`.
 * I use `networkmanager` for network/Internet access
 * Always `fastfetch` for good luck ;)
@@ -95,7 +95,7 @@ I currently use KDE Plasma because it's epic. Other supported DEs can be found o
 To install a fully featured KDE Plasma session with my preferred KDE apps + Firefox as the web browser, run the following command:
 
 ```sh
-# pacman -S plasma-meta kde-system-meta plymouth-kcm breeze5 dolphin-plugins ffmpegthumbs kdeconnect kdegraphics-thumbnailers kdenetwork-filesharing kwalletmanager phonon-qt6-vlc plasma5-integration icoutils power-profiles-daemon thermald ark dragon elisa filelight gwenview kamoso kate kcalc kcharselect kdialog konsole kup markdownpart okular svgpart firefox
+# pacman -S plasma-meta kde-system-meta plymouth-kcm breeze5 dolphin-plugins ffmpegthumbs kdeconnect kdegraphics-thumbnailers kdenetwork-filesharing kmines knights kpat kwalletmanager phonon-qt6-vlc plasma5-integration icoutils power-profiles-daemon thermald ark dragon elisa filelight gwenview kamoso kate kcalc kcharselect kdialog konsole kup markdownpart okular svgpart firefox
 ```
 
 Don't forget to enable `plasmalogin.service` to actually boot into a graphical session.
@@ -139,7 +139,9 @@ There's only a couple more steps!
 
 Install [systemd-boot](https://wiki.archlinux.org/title/Systemd-boot) as the bootloader. Systemd-boot automatically picks up UKIs on the ESP, so no further configuration is required to boot. Make sure to actually regenerate the initramfs now to build a UKI and place it on the ESP.
 
-At this point we need to get Secure Boot enabled, so it's time to reboot into the new installation. Make a quick detour into the BIOS to put Secure Boot in setup mode so keys can be enrolled. After logging in to the new install, make a fastfetch screenshot for good luck before proceeding.
+### Secure Boot (optional)
+
+In order to set up Secure Boot, reboot to the BIOS, put Secure Boot in "setup mode", and then boot into the new system. After logging in to the new install, make a fastfetch screenshot for good luck before proceeding.
 
 I use the [manual process](https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot#Manual_process) to generate/enroll keys, but I wrote a script which largely automates the entire thing. Download and run it:
 
@@ -204,10 +206,10 @@ I also like to add the [Chaotic-AUR](https://aur.chaotic.cx/) repository to my s
 Now, here's all the other apps I like to install: 
 
 ```sh
-$ yay -S --needed awatcher-bundle-bin bleachbit btop digikam discord easyeffects gamemode lib32-gamemode informant kdenlive keepassxc kweather libreoffice-fresh mangohud modrinth-app needrestart obs-studio droidcam-obs-plugin obs-vkcapture-git lib32-obs-vkcapture-git obs-wayland-hotkeys-git pacman-cleanup-hook rpc-bridge-bin spotify steam visual-studio-code-bin vlc
+$ yay -S --needed awatcher-bundle-bin btop digikam discord easyeffects gamemode lib32-gamemode informant kdenlive keepassxc kweather libreoffice-fresh mangohud modrinth-app needrestart obs-studio droidcam-obs-plugin obs-vkcapture-git lib32-obs-vkcapture-git obs-wayland-hotkeys-git pacman-cleanup-hook spotify steam vlc
 ```
 
-And finally my Plasma dotfiles. Follow the instructions on [the repository](https://github.com/EJSnow/dotfiles) and that will about do it (currently the panel layout isn't done automatically though).![My Arch setup](/images/my-arch-setup.jpg)
+And finally my Plasma dotfiles. Follow the instructions on [the repository](https://github.com/EJSnow/dotfiles) and that will about do it.![My Arch setup](/images/my-arch-setup.jpg)
 
 ## References/See Also
 
