@@ -31,7 +31,7 @@
             <ul id="toc-contents"></ul>
           </details>
           
-          <p>My preferred route for installing Arch Linux including Secure Boot support. This mostly exists just in case I ever have to do a full reinstall/just because I want to fully document my installation route.</p>
+          <p>My preferred route for installing Arch Linux including optional Secure Boot support. This mostly exists just in case I ever have to do a full reinstall/just because I want to fully document my installation route.</p>
 <p><strong>Important:</strong> This is my own personalized installation guide for personal use. I do not recommend following this if you aren't me. Use the <a href="https://wiki.archlinux.org/title/Installation_guide">official installation</a> guide instead.</p>
 <p>This setup uses systemd-boot as the bootloader and boots from a signed unified kernel image (UKI) incorporating the kernel image, initrd, and kernel commandline in one file to reduce complexity (as a side benefit, the initrd and kernel commandline are also validated by Secure Boot).</p>
 <h2 id="warming-up" tabindex="-1">Warming up</h2>
@@ -40,7 +40,7 @@
 <p>Set the console font if necessary (for example on not-quite-HiDPI laptop screens) and ensure you have Internet access as described in the <a href="https://wiki.archlinux.org/title/Installation_guide#Connect_to_the_internet">installation guide</a>.</p>
 <h2 id="partitioning" tabindex="-1">Partitioning</h2>
 <p>See the <a href="https://wiki.archlinux.org/title/Installation_guide#Partition_the_disks">installation guide</a> and <a href="https://wiki.archlinux.org/title/Partitioning#Partition_scheme">Partitioning#Partition scheme</a> for more details.</p>
-<p>Below is my preferred partitioning scheme (GPT/UEFI). I use swap on zram and a larger swap file for hibernation (if hibernation is desired). For an NVME drive the partitions will be <code>/dev/nvme0n1p1</code> for the ESP and <code>/dev/nvme0n1p2</code> for the root partition. I honestly don't put too much stock in the partition numbers though since they often end up being completely different due to dual-booting shenaniganery. Use <code>lsblk</code> to ensure you've got the partitions straight :)</p>
+<p>Below is my preferred partitioning scheme (GPT/UEFI). I use swap on zram and do not require hibernation.</p>
 <table>
 <thead>
 <tr>
@@ -53,19 +53,19 @@
 <tbody>
 <tr>
 <td><code>/efi</code></td>
-<td><code>/dev/sda1</code></td>
-<td><code>C12A7328-F81F-11D2-BA4B-00A0C93EC93B</code>: EFI system partition (<code>uefi</code> alias in fdisk)</td>
+<td>EFI System Partition</td>
+<td><code>C12A7328-F81F-11D2-BA4B-00A0C93EC93B</code> (<code>uefi</code> alias in fdisk)</td>
 <td>250MiB-1GiB</td>
 </tr>
 <tr>
 <td><code>/</code></td>
-<td><code>/dev/sda2</code></td>
-<td><code>4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709</code>: Linux x86_64 root</td>
+<td>Linux x86_64 root</td>
+<td><code>4F68BCE3-E8CD-4DB1-96E7-FBCAF984B709</code></td>
 <td>Remainder of the drive.</td>
 </tr>
 </tbody>
 </table>
-<p>Create the partitions using, e.g, <a href="https://wiki.archlinux.org/title/Fdisk">fdisk</a>. Obviously <strong>all data on the drive will be erased</strong> so take appropriate precautions.</p>
+<p>Create the partitions using, e.g, <a href="https://wiki.archlinux.org/title/Fdisk">fdisk</a>. Obviously <strong>all data on the drive will be erased</strong> so take appropriate precautions. Make note of the numbers (e.g sda1, sda2, etc).</p>
 <p>Now the root partition can be formatted as ext4 (although other filesystems can be used).</p>
 <pre><code class="language-sh"># mkfs.ext4 -L &quot;Arch Linux&quot; /dev/sda2
 </code></pre>
@@ -74,12 +74,12 @@
 </code></pre>
 <p>Mount the root partition to <code>/mnt</code> and the ESP to <code>/mnt/efi</code>.</p>
 <h2 id="installing-the-base-system" tabindex="-1">Installing the base system</h2>
-<p>Generally refer to the <a href="https://wiki.archlinux.org/title/Installation_guide#Installation">official</a> installation guide for this part. The following reflector command can be used to generate a good mirrorlist for the US:</p>
-<pre><code class="language-sh"># reflector --latest 10 --sort rate --country 'United States' --save /etc/pacman.d/mirrorlist
+<p>Generally refer to the <a href="https://wiki.archlinux.org/title/Installation_guide#Installation">official</a> installation guide for this part. Before installing packages, the following reflector command should be used to generate the pacman mirrorlist:</p>
+<pre><code class="language-sh"># reflector --latest 5 --sort rate --country 'United States' --save /etc/pacman.d/mirrorlist
 </code></pre>
 <p>Anyways time to <code>pacstrap</code> the system. Suggested packages to add to the pacstrap command (my choices plus some things beyond what the installation guide suggests):</p>
 <ul>
-<li><code>base-devel</code> for AUR packages and possibly other shenanigans</li>
+<li><code>base-devel</code> for AUR packages and development</li>
 <li>Userspace filesystem utilities: At a minimum, <code>dosfstools</code>, <code>e2fsprogs</code>, and <code>exfatprogs</code>. <code>ntfsprogs</code> might be wanted for NTFS. If I ever get into Btrfs, obviously <code>btrfs-progs</code>.</li>
 <li>I use <code>networkmanager</code> for network/Internet access</li>
 <li>Always <code>fastfetch</code> for good luck ;)</li>
@@ -99,7 +99,7 @@ zram-size = min(ram / 2, 16384)
 <h3 id="desktop-environment" tabindex="-1">Desktop environment</h3>
 <p>I currently use KDE Plasma because it's epic. Other supported DEs can be found on the <a href="https://wiki.archlinux.org/title/Desktop_environment">Desktop Environment</a> ArchWiki page.</p>
 <p>To install a fully featured KDE Plasma session with my preferred KDE apps + Firefox as the web browser, run the following command:</p>
-<pre><code class="language-sh"># pacman -S plasma-meta kde-system-meta plymouth-kcm breeze5 dolphin-plugins ffmpegthumbs kdeconnect kdegraphics-thumbnailers kdenetwork-filesharing kwalletmanager phonon-qt6-vlc plasma5-integration icoutils power-profiles-daemon thermald ark dragon elisa filelight gwenview kamoso kate kcalc kcharselect kdialog konsole kup markdownpart okular svgpart firefox
+<pre><code class="language-sh"># pacman -S plasma-meta kde-system-meta plymouth-kcm breeze5 dolphin-plugins ffmpegthumbs kdeconnect kdegraphics-thumbnailers kdenetwork-filesharing kmines knights kpat kwalletmanager phonon-qt6-vlc plasma5-integration icoutils power-profiles-daemon thermald ark dragon elisa filelight gwenview kamoso kate kcalc kcharselect kdialog konsole kup markdownpart okular svgpart firefox
 </code></pre>
 <p>Don't forget to enable <code>plasmalogin.service</code> to actually boot into a graphical session.</p>
 <p>For graphics drivers consult this handy table for Intel and AMD graphics (note that <code>mesa</code> which provides the basic graphics stack and OpenGL drivers is required by Plasma so is already installed):</p>
@@ -137,7 +137,8 @@ zram-size = min(ram / 2, 16384)
 <h2 id="finishing-up" tabindex="-1">Finishing up</h2>
 <p>There's only a couple more steps!</p>
 <p>Install <a href="https://wiki.archlinux.org/title/Systemd-boot">systemd-boot</a> as the bootloader. Systemd-boot automatically picks up UKIs on the ESP, so no further configuration is required to boot. Make sure to actually regenerate the initramfs now to build a UKI and place it on the ESP.</p>
-<p>At this point we need to get Secure Boot enabled, so it's time to reboot into the new installation. Make a quick detour into the BIOS to put Secure Boot in setup mode so keys can be enrolled. After logging in to the new install, make a fastfetch screenshot for good luck before proceeding.</p>
+<h3 id="secure-boot-(optional)" tabindex="-1">Secure Boot (optional)</h3>
+<p>In order to set up Secure Boot, reboot to the BIOS, put Secure Boot in &quot;setup mode&quot;, and then boot into the new system. After logging in to the new install, make a fastfetch screenshot for good luck before proceeding.</p>
 <p>I use the <a href="https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot#Manual_process">manual process</a> to generate/enroll keys, but I wrote a script which largely automates the entire thing. Download and run it:</p>
 <pre><code class="language-sh">$ curl -L -O https://ejsnow.github.io/resources/sbKeySetup.sh
 $ chmod +x sbKeySetup.sh
@@ -174,9 +175,9 @@ $ makepkg -sci
 </code></pre>
 <p>I also like to add the <a href="https://aur.chaotic.cx/">Chaotic-AUR</a> repository to my systems so installing AUR packages doesn't take a million years. It provides prebuilt versions of popular AUR packages and is very nice to have.</p>
 <p>Now, here's all the other apps I like to install:</p>
-<pre><code class="language-sh">$ yay -S --needed awatcher-bundle-bin bleachbit btop digikam discord easyeffects gamemode lib32-gamemode informant kdenlive keepassxc kweather libreoffice-fresh mangohud modrinth-app needrestart obs-studio droidcam-obs-plugin obs-vkcapture-git lib32-obs-vkcapture-git obs-wayland-hotkeys-git pacman-cleanup-hook rpc-bridge-bin spotify steam visual-studio-code-bin vlc
+<pre><code class="language-sh">$ yay -S --needed awatcher-bundle-bin btop digikam discord easyeffects gamemode lib32-gamemode informant kdenlive keepassxc kweather libreoffice-fresh mangohud modrinth-app needrestart obs-studio droidcam-obs-plugin obs-vkcapture-git lib32-obs-vkcapture-git obs-wayland-hotkeys-git pacman-cleanup-hook spotify steam vlc
 </code></pre>
-<p>And finally my Plasma dotfiles. Follow the instructions on <a href="https://github.com/EJSnow/dotfiles">the repository</a> and that will about do it (currently the panel layout isn't done automatically though).<img src="/images/my-arch-setup.jpg" alt="My Arch setup"></p>
+<p>And finally my Plasma dotfiles. Follow the instructions on <a href="https://github.com/EJSnow/dotfiles">the repository</a> and that will about do it.<img src="/images/my-arch-setup.jpg" alt="My Arch setup"></p>
 <h2 id="references%2Fsee-also" tabindex="-1">References/See Also</h2>
 <p>I wrote this with the help of MANY ArchWiki pages and a few manpages. Seriously the ArchWiki is amazing, go <a href="https://wiki.archlinux.org">check it out</a>.</p>
 <ul>
